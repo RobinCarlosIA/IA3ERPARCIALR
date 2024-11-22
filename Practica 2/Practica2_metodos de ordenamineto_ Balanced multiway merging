@@ -1,0 +1,82 @@
+# Ordenamiento Externo por Mezcla Equilibrada Multi-Vía (Balanced Multiway Merging)
+# Este método divide los datos en bloques pequeños, los ordena y luego los mezcla utilizando varios archivos.
+
+import os
+
+def dividir_en_bloques(lista, num_bloques):
+    """
+    Divide una lista en varios bloques pequeños y los ordena.
+    """
+    bloques = []
+    tamaño_bloque = len(lista) // num_bloques
+    for i in range(num_bloques):
+        # Tomamos una parte de la lista
+        bloque = lista[i * tamaño_bloque:(i + 1) * tamaño_bloque]
+        # Ordenamos el bloque
+        bloque_ordenado = sorted(bloque)
+        # Guardamos el bloque ordenado en un archivo temporal
+        nombre_bloque = f'bloque_{i}.txt'
+        with open(nombre_bloque, 'w') as archivo:
+            archivo.writelines(f"{x}\n" for x in bloque_ordenado)
+        bloques.append(nombre_bloque)
+    return bloques
+
+def mezclar_bloques(bloques, archivo_salida):
+    """
+    Mezcla múltiples bloques ordenados en un archivo final ordenado.
+    """
+    archivos = [open(bloque, 'r') for bloque in bloques]
+    salida = open(archivo_salida, 'w')
+
+    # Leer la primera línea de cada archivo
+    actuales = [int(archivo.readline().strip()) if (line := archivo.readline().strip()) else None for archivo in archivos]
+
+    while any(actuales):
+        # Encuentra el menor valor entre los bloques
+        menor_valor = min(x for x in actuales if x is not None)
+        menor_indice = actuales.index(menor_valor)
+
+        # Escribe el menor valor al archivo de salida
+        salida.write(f"{menor_valor}\n")
+
+        # Avanza en el archivo correspondiente
+        linea = archivos[menor_indice].readline()
+        actuales[menor_indice] = int(linea.strip()) if linea else None
+
+    # Cerramos los archivos
+    for archivo in archivos:
+        archivo.close()
+    salida.close()
+
+    # Eliminamos los archivos temporales
+    for bloque in bloques:
+        os.remove(bloque)
+
+def balanced_multiway_merging(lista, num_bloques, archivo_salida):
+    """
+    Ordena una lista grande utilizando el método de mezcla equilibrada multi-vía.
+    """
+    # Dividimos los datos en bloques pequeños ordenados
+    bloques = dividir_en_bloques(lista, num_bloques)
+
+    # Mezclamos los bloques ordenados en un único archivo
+    mezclar_bloques(bloques, archivo_salida)
+
+# Ejemplo de uso
+mi_lista = [38, 27, 43, 3, 9, 82, 10, 50, 60, 40, 30, 70]
+print("Lista original:", mi_lista)
+
+# Número de bloques a dividir
+num_bloques = 3
+
+# Archivo de salida
+archivo_salida = 'ordenado.txt'
+
+# Llamamos al método de ordenamiento externo
+print("\nIniciando el ordenamiento por Mezcla Equilibrada Multi-Vía...\n")
+balanced_multiway_merging(mi_lista, num_bloques, archivo_salida)
+
+# Verificar el archivo ordenado
+with open(archivo_salida, 'r') as f:
+    print("Lista ordenada:")
+    print(f.read())

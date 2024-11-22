@@ -1,0 +1,28 @@
+# Ordenamiento por Selección (Selection Sort)
+# Este método encuentra el número más pequeño en cada paso y lo coloca en su posición correcta.
+
+def selection_sort(lista):
+    # Recorremos toda la lista
+    for i in range(len(lista)):
+        # Suponemos que el primer elemento no ordenado es el más pequeño
+        indice_minimo = i
+
+        # Comparamos con los demás elementos que siguen en la lista
+        for j in range(i + 1, len(lista)):
+            # Si encontramos un número más pequeño, actualizamos el índice del mínimo
+            if lista[j] < lista[indice_minimo]:
+                indice_minimo = j
+
+        # Intercambiamos el valor más pequeño encontrado con el actual
+        lista[i], lista[indice_minimo] = lista[indice_minimo], lista[i]
+
+    # Devolvemos la lista ya ordenada
+    return lista
+
+# Ejemplo de uso
+mi_lista = [29, 10, 14, 37, 13]
+print("Lista original:", mi_lista)
+
+# Llamamos a la función para ordenar la lista
+lista_ordenada = selection_sort(mi_lista)
+print("Lista ordenada:", lista_ordenada)

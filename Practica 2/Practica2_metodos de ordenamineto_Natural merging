@@ -1,0 +1,86 @@
+# Ordenamiento Externo por Mezcla Natural (Natural Merging)
+# Este método encuentra subsecuencias ordenadas dentro de los datos y las mezcla para ordenarlas completamente.
+
+def encontrar_runs(lista):
+    """
+    Encuentra subsecuencias ordenadas (runs) en una lista.
+    """
+    runs = []
+    run_actual = [lista[0]]
+
+    for i in range(1, len(lista)):
+        if lista[i] >= lista[i - 1]:
+            # Si el elemento actual es mayor o igual al anterior, continúa el run
+            run_actual.append(lista[i])
+        else:
+            # Si no, termina el run actual y comienza uno nuevo
+            runs.append(run_actual)
+            run_actual = [lista[i]]
+
+    # Agregamos el último run
+    runs.append(run_actual)
+    return runs
+
+def mezclar_runs(runs):
+    """
+    Mezcla todas las subsecuencias ordenadas (runs) en una lista ordenada.
+    """
+    while len(runs) > 1:
+        nuevos_runs = []
+
+        # Mezclamos los runs de dos en dos
+        for i in range(0, len(runs), 2):
+            if i + 1 < len(runs):
+                # Mezclamos dos runs
+                nuevos_runs.append(mezclar_dos_runs(runs[i], runs[i + 1]))
+            else:
+                # Si hay un run sin pareja, lo pasamos directamente
+                nuevos_runs.append(runs[i])
+
+        runs = nuevos_runs
+
+    # Retornamos el único run restante, que será la lista ordenada
+    return runs[0]
+
+def mezclar_dos_runs(run1, run2):
+    """
+    Mezcla dos runs ordenados en uno solo.
+    """
+    resultado = []
+    i, j = 0, 0
+
+    # Comparamos elementos de ambos runs y los agregamos al resultado
+    while i < len(run1) and j < len(run2):
+        if run1[i] < run2[j]:
+            resultado.append(run1[i])
+            i += 1
+        else:
+            resultado.append(run2[j])
+            j += 1
+
+    # Agregamos los elementos restantes de ambos runs (si quedan)
+    resultado.extend(run1[i:])
+    resultado.extend(run2[j:])
+
+    return resultado
+
+def natural_merging(lista):
+    """
+    Ordena una lista usando el método de Mezcla Natural.
+    """
+    # Paso 1: Encontrar las subsecuencias ordenadas (runs)
+    runs = encontrar_runs(lista)
+    print(f"Subsecuencias iniciales (runs): {runs}")
+
+    # Paso 2: Mezclar los runs hasta obtener la lista ordenada
+    lista_ordenada = mezclar_runs(runs)
+    return lista_ordenada
+
+# Ejemplo de uso
+mi_lista = [3, 5, 7, 2, 4, 8, 1, 6, 9]
+print("Lista original:", mi_lista)
+
+# Ordenamos la lista usando Natural Merging
+print("\nIniciando el ordenamiento por Mezcla Natural...\n")
+lista_ordenada = natural_merging(mi_lista)
+print("\nLista ordenada:", lista_ordenada)

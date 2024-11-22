@@ -1,0 +1,86 @@
+# Ordenamiento Externo por Distribución de Runs Iniciales
+# Este método divide los datos en subsecuencias ordenadas (runs) y luego las mezcla.
+
+def encontrar_runs(lista):
+    """
+    Encuentra subsecuencias ordenadas (runs) en una lista.
+    """
+    runs = []
+    run_actual = [lista[0]]
+
+    for i in range(1, len(lista)):
+        if lista[i] >= lista[i - 1]:
+            # Si el elemento actual es mayor o igual al anterior, continúa el run
+            run_actual.append(lista[i])
+        else:
+            # Si no, termina el run actual y comienza uno nuevo
+            runs.append(run_actual)
+            run_actual = [lista[i]]
+
+    # Agregamos el último run
+    runs.append(run_actual)
+    return runs
+
+def mezclar_dos_runs(run1, run2):
+    """
+    Mezcla dos runs ordenados en uno solo, también ordenado.
+    """
+    resultado = []
+    i, j = 0, 0
+
+    # Mezclamos los dos runs comparando elemento por elemento
+    while i < len(run1) and j < len(run2):
+        if run1[i] < run2[j]:
+            resultado.append(run1[i])
+            i += 1
+        else:
+            resultado.append(run2[j])
+            j += 1
+
+    # Agregamos los elementos restantes (si quedan)
+    resultado.extend(run1[i:])
+    resultado.extend(run2[j:])
+    return resultado
+
+def mezclar_todos_los_runs(runs):
+    """
+    Mezcla iterativamente todos los runs hasta obtener una lista ordenada.
+    """
+    while len(runs) > 1:
+        nuevos_runs = []
+
+        # Mezclamos los runs de dos en dos
+        for i in range(0, len(runs), 2):
+            if i + 1 < len(runs):
+                # Mezclamos dos runs
+                nuevo_run = mezclar_dos_runs(runs[i], runs[i + 1])
+                nuevos_runs.append(nuevo_run)
+            else:
+                # Si hay un run sin pareja, lo pasamos directamente
+                nuevos_runs.append(runs[i])
+
+        runs = nuevos_runs
+
+    # El último run es la lista completamente ordenada
+    return runs[0]
+
+def distribution_of_initial_runs(lista):
+    """
+    Ordena una lista usando el método de distribución de runs iniciales.
+    """
+    # Paso 1: Encontrar las subsecuencias ordenadas iniciales (runs)
+    runs = encontrar_runs(lista)
+    print(f"Runs iniciales: {runs}")
+
+    # Paso 2: Mezclar los runs hasta obtener la lista completamente ordenada
+    lista_ordenada = mezclar_todos_los_runs(runs)
+    return lista_ordenada
+
+# Ejemplo de uso
+mi_lista = [38, 27, 43, 3, 9, 82, 10, 50, 60]
+print("Lista original:", mi_lista)
+
+# Ordenar la lista usando Distribution of Initial Runs
+print("\nIniciando el ordenamiento por Distribución de Runs Iniciales...\n")
+lista_ordenada = distribution_of_initial_runs(mi_lista)
+print("\nLista ordenada:", lista_ordenada)

@@ -1,0 +1,64 @@
+# Ordenamiento Externo por Mezcla Polifase (Polyphase Sort)
+# Este método utiliza múltiples bloques para ordenar datos que no caben en memoria.
+
+def dividir_en_bloques(lista, num_bloques):
+    """
+    Divide la lista en bloques desiguales para simular la estrategia de Polyphase.
+    """
+    bloques = []
+    tamaño_bloque = len(lista) // num_bloques
+    for i in range(num_bloques - 1):
+        # Dividimos en bloques de tamaño similar
+        bloques.append(lista[i * tamaño_bloque:(i + 1) * tamaño_bloque])
+    # El último bloque puede ser más grande o contener el resto
+    bloques.append(lista[(num_bloques - 1) * tamaño_bloque:])
+    return bloques
+
+def mezclar_dos_bloques(bloque1, bloque2):
+    """
+    Mezcla dos bloques ordenados en uno solo, también ordenado.
+    """
+    resultado = []
+    i, j = 0, 0
+
+    # Mezclamos los dos bloques comparando elemento por elemento
+    while i < len(bloque1) and j < len(bloque2):
+        if bloque1[i] < bloque2[j]:
+            resultado.append(bloque1[i])
+            i += 1
+        else:
+            resultado.append(bloque2[j])
+            j += 1
+
+    # Agregamos los elementos restantes (si quedan)
+    resultado.extend(bloque1[i:])
+    resultado.extend(bloque2[j:])
+    return resultado
+
+def polyphase_sort(lista, num_bloques):
+    """
+    Ordena una lista grande usando el método Polyphase Sort.
+    """
+    # Paso 1: Dividir la lista en bloques desiguales
+    bloques = dividir_en_bloques(sorted(lista), num_bloques)
+    print(f"Bloques iniciales: {bloques}")
+
+    # Paso 2: Simular la mezcla polifase
+    while len(bloques) > 1:
+        nuevo_bloque = mezclar_dos_bloques(bloques[0], bloques[1])
+        print(f"Mezclando bloques: {bloques[0]} y {bloques[1]} -> {nuevo_bloque}")
+        bloques = bloques[2:]  # Eliminamos los bloques ya mezclados
+        bloques.append(nuevo_bloque)  # Agregamos el nuevo bloque mezclado
+
+    # El último bloque es la lista ordenada
+    return bloques[0]
+
+# Ejemplo de uso
+mi_lista = [38, 27, 43, 3, 9, 82, 10]
+print("Lista original:", mi_lista)
+
+# Ordenar la lista usando Polyphase Sort
+print("\nIniciando el ordenamiento por Polyphase Sort...")
+lista_ordenada = polyphase_sort(mi_lista, 3)
+print("\nLista ordenada:", lista_ordenada)
+
